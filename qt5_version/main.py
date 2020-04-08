@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from settings import *
 from buttons import *
+from p2p import *
 
 class gameStartUI(QWidget):
     def __init__(self, parent = None, **kwargs):
@@ -19,7 +20,7 @@ class gameStartUI(QWidget):
 
         #button
         #p2c
-        self.ai_button = PushButton(cfg.BUTTON_IMAGEPATHS.get('ai'), self)
+        self.ai_button = PushButton(BUTTON_IMAGEPATHS.get('ai'), self)
         self.ai_button.move(250, 200)
         self.ai_button.show()
         self.ai_button.click_signal.connect(self.playWithAI)
@@ -30,9 +31,9 @@ class gameStartUI(QWidget):
         self.online_button.click_signal.connect(self.playOnline)
 
     def playOnline(self):
-        #self.close()
-        #self.gaming_ui = playOnlineUI(cfg, self)
-        #self.gaming_ui.show()
+        self.close()
+        self.game_type = P2p(0, 1, 'a', 6666)
+        self.game_type.show()
 
     def playWithAI(self):
         pass

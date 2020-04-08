@@ -1,5 +1,18 @@
 import os
 
+TITLE = "Two Beats One"
+WIDTH = 750
+HEIGHT = 750
+MARGIN_LEFT = WIDTH / 10
+MARGIN_TOP = HEIGHT / 10
+LINES = 4
+GRID_WIDTH = (WIDTH - 2 * MARGIN_LEFT) / (LINES - 1)
+GRID_HEIGHT = (HEIGHT - 2 * MARGIN_TOP) / (LINES - 1)
+PIECE_SIZE = int(GRID_WIDTH // 4)
+
+SERVERNAME = '34.87.108.23'
+PORT = 6666
+
 #icon path
 ICON_FILEPATH = os.path.join(os.getcwd(), 'img/icon/icon.ico')
 
