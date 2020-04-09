@@ -33,22 +33,74 @@ class P2p(QWidget):
         self.recvSignal.connect(self.transData)
 
         self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.tcpSocket.connect((SERVERNAME, PORT))
+       # self.tcpSocket.connect((SERVERNAME, PORT))
         data = {'type': 'ownName', 'data': self.ownName}
-        self.tcpSocket.sendall(self.packSocket(data))
+       # self.tcpSocket.sendall(self.packSocket(data))
         
-        threading.Thread(target = self.recvData).start()
         #start a threading listening server
+        threading.Thread(target = self.recvData).start()
 
 
-        self.setFixedSize(750, 750)
-        self.setWindowTitle('Two Beats One')
-        #self.setWindowIcon(QIcon(ICON_FILEPATH))
-        
-        #bgi
+        #set bgi
+        bgi = QPixmap('bg7.jpg')
+        bgi = bgi.scaled(900, 750)
         palette = QPalette()
-        palette.setBrush(self.backgroundRole(), QBrush(QPixmap(BACKGROUND_IMAGEPATHS.get('bg_game'))))
+        palette.setBrush(self.backgroundRole(), QBrush(bgi))
         self.setPalette(palette)
+
+        #set layout
+        self.creatBoardWindow()
+        self.creatChatWindow()
+        layout = QHBoxLayout()
+        layout.addLayout(self.boardWindow)
+        layout.addLayout(self.chatWindow)
+        self.setLayout(layout)
+
+        self.resize(900, 750)
+        self.show()
+
+    def creatBoardWindow(self):
+        self.boardWindow = QVBoxLayout()
+        
+        #creat button
+        buttonLayout = QHBoxLayout()
+        
+        self.startBtn = QPushButton('开始', self)
+        self.backBtn = QPushButton('悔棋', self)
+        self.giveUpBtn = QPushButton('认输', self)
+        self.exitBtn = QPushButton('退出', self)
+
+        buttonLayout.setSpacing(10) 
+        buttonLayout.addWidget(self.startBtn)
+        buttonLayout.addWidget(self.backBtn)
+        buttonLayout.addWidget(self.giveUpBtn)
+        buttonLayout.addWidget(self.exitBtn)
+
+        #creat chess board
+
+        bgi = QPixmap('board1.png')
+        bgi = bgi.scaled(600, 600, Qt.KeepAspectRatio, Qt.FastTransformation)
+        board = QLabel()
+        board.setPixmap(bgi)
+
+        self.boardWindow.addLayout(buttonLayout)
+        self.boardWindow.addWidget(board)
+
+    def creatChatWindow(self):
+        self.chatWindow = QVBoxLayout()
+
+        nameLabel = QLabel("Chat Window")
+        self.recvField = QTextEdit()
+        self.sendField = QTextEdit()
+        self.sendBtn = QPushButton('发送')
+
+        self.recvField.setFocusPolicy(Qt.NoFocus) 
+
+        self.chatWindow.setSpacing(2)
+        self.chatWindow.addWidget(nameLabel)
+        self.chatWindow.addWidget(self.recvField)
+        self.chatWindow.addWidget(self.sendField)
+        self.chatWindow.addWidget(self.sendBtn)
 
     #to transcation data received
     def transData(self, data):

@@ -1,10 +1,8 @@
 import sys
-from PyQt5.QtWidgets import (QWidget, QToolTip, QMainWindow, QAction, qApp, QMenu, 
-    QPushButton, QApplication, QMessageBox, QDesktopWidget, QHBoxLayout, QVBoxLayout, 
-    QGridLayout,QLabel, QLineEdit, QTextEdit, QLCDNumber, QSlider, QInputDialog, QProgressBar)
+from PyQt5.QtWidgets import * 
 
-from PyQt5.QtGui import QFont, QIcon 
-from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject, QBasicTimer
+from PyQt5.QtGui import * 
+from PyQt5.QtCore import * 
 
 class Menu(QMainWindow):
 
@@ -335,9 +333,167 @@ class ProgressBar(QWidget):
             self.timer.start(100, self)
             self.btn.setText('Stop')
         
+class Testtt(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+    
+    def initUI(self):
+        self.createGridGroupBox()
+        self.creatVboxGroupBox()
+        self.creatFormGroupBox()
+        mainLayout = QVBoxLayout()
+        hboxLayout = QHBoxLayout()
+        hboxLayout.addStretch()  
+        hboxLayout.addWidget(self.gridGroupBox)
+        hboxLayout.addWidget(self.vboxGroupBox)
+        mainLayout.addLayout(hboxLayout)
+        mainLayout.addWidget(self.formGroupBox)
+        self.setLayout(mainLayout)
+
+        self.resize(750, 750)
+        self.show()
+
+    def createGridGroupBox(self):
+        self.gridGroupBox = QGroupBox("Grid layout")
+        layout = QGridLayout()
+
+        nameLabel = QLabel("中文名称")
+        nameLineEdit = QLineEdit("天宫二号")
+        emitLabel = QLabel("发射地点")
+        emitLineEdit = QLineEdit("酒泉中心")
+        timeLabel = QLabel("发射时间")
+        timeLineEdit = QLineEdit("9月15日")
+        imgeLabel = QLabel()
+        layout.setSpacing(10) 
+        layout.addWidget(nameLabel,1,0)
+        layout.addWidget(nameLineEdit,1,1)
+        layout.addWidget(emitLabel,2,0)
+        layout.addWidget(emitLineEdit,2,1)
+        layout.addWidget(timeLabel,3,0)
+        layout.addWidget(timeLineEdit,3,1)
+        layout.addWidget(imgeLabel,0,2,4,1)
+        layout.setColumnStretch(1, 10)
+        self.gridGroupBox.setLayout(layout)
+        self.setWindowTitle('Basic Layout')
+
+    def creatVboxGroupBox(self):
+        self.vboxGroupBox = QGroupBox("Vbox layout")
+        layout = QVBoxLayout() 
+        nameLabel = QLabel("科研任务：")
+        bigEditor = QTextEdit()
+        bigEditor.setPlainText("搭载了空间冷原子钟等14项应用载荷，以及失重心血管研究等航天医学实验设备 "
+                "开展空间科学及技术试验.")
+        layout.addWidget(nameLabel)
+        layout.addWidget(bigEditor)
+        self.vboxGroupBox.setLayout(layout)
+
+    def creatFormGroupBox(self):
+        self.formGroupBox = QGroupBox("Form layout")
+        layout = QFormLayout()
+        performanceLabel = QLabel("性能特点：")
+        performanceEditor = QLineEdit("舱内设计更宜居方便天宫生活")
+        planLabel = QLabel("发射规划：")
+        planEditor = QTextEdit()
+        planEditor.setPlainText("2020年之前，中国计划初步完成空间站建设")
+        layout.addRow(performanceLabel,performanceEditor)
+        layout.addRow(planLabel,planEditor)
+
+        self.formGroupBox.setLayout(layout)
+
+class chessBoard(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+    
+    def initUI(self):
+
+        #set bgi
+        bgi = QPixmap('bg7.jpg')
+        bgi = bgi.scaled(900, 750)
+        palette = QPalette()
+        palette.setBrush(self.backgroundRole(), QBrush(bgi))
+        self.setPalette(palette)
+
+        #set layout
+        self.creatBoardWindow()
+        self.creatChatWindow()
+        layout = QHBoxLayout()
+        layout.addLayout(self.boardWindow)
+        layout.addLayout(self.chatWindow)
+        self.setLayout(layout)
+
+        self.resize(900, 750)
+        self.show()
+
+    def creatBoardWindow(self):
+        self.boardWindow = QVBoxLayout()
+        
+        #creat button
+        buttonLayout = QHBoxLayout()
+        
+        self.btn1 = QPushButton('开始', self)
+        self.btn2 = QPushButton('悔棋', self)
+        self.btn3 = QPushButton('认输', self)
+        self.btn4 = QPushButton('退出', self)
+
+        buttonLayout.setSpacing(10) 
+        buttonLayout.addWidget(self.btn1)
+        buttonLayout.addWidget(self.btn2)
+        buttonLayout.addWidget(self.btn3)
+        buttonLayout.addWidget(self.btn4)
+
+        #creat chess board
+
+        bgi = QPixmap('board1.png')
+        bgi = bgi.scaled(600, 600, Qt.KeepAspectRatio, Qt.FastTransformation)
+        board = QLabel()
+        board.setPixmap(bgi)
+
+        self.boardWindow.addLayout(buttonLayout)
+        self.boardWindow.addWidget(board)
+
+    def creatChatWindow(self):
+        self.chatWindow = QVBoxLayout()
+
+        nameLabel = QLabel("Chat Window")
+        self.recvField = QTextEdit()
+        self.sendField = QTextEdit()
+        self.sendBtn = QPushButton('发送')
+
+        self.recvField.setFocusPolicy(Qt.NoFocus) 
+
+        self.chatWindow.setSpacing(2)
+        self.chatWindow.addWidget(nameLabel)
+        self.chatWindow.addWidget(self.recvField)
+        self.chatWindow.addWidget(self.sendField)
+        self.chatWindow.addWidget(self.sendBtn)
+
+class bgi(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+    
+    def initUI(self):
+
+        #set bgi
+        bgi = QPixmap('bg7.jpg')
+        bgi = bgi.scaled(900, 750)
+        palette = QPalette()
+        palette.setBrush(self.backgroundRole(), QBrush(bgi))
+        self.setPalette(palette)
+
+        self.setFixedSize(900, 750)
+        self.show()
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = ProgressBar()
+    ex = chessBoard()
     sys.exit(app.exec_())

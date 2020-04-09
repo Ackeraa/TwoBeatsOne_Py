@@ -6,13 +6,13 @@ fig.patch.set_facecolor((.8, 1, 1))
 
 ax = fig.add_subplot(111)
 
-img = plt.imread('bgi.png')
-ax.imshow(img)
+#img = plt.imread('bgi.png')
+#ax.imshow(img)
 # draw the grid
 for x in range(4):
-    ax.plot([100 + x * 400, 100 + x * 400], [100, 1300], color = '#4d200c', linewidth = 4)
+    ax.plot([100 + x * 400, 100 + x * 400], [100, 1300], color = '#08445D', linewidth = 5)
 for y in range(4):
-    ax.plot([100, 1300], [100 + y * 400 , 100 + y * 400], color = '#4d200c', linewidth = 4)
+    ax.plot([100, 1300], [100 + y * 400 , 100 + y * 400], color = '#08445D', linewidth = 5)
 
 # scale the axis area to fill the whole figure
 ax.set_position([0, 0, 1, 1])
