@@ -15,7 +15,7 @@ class gameStartUI(QWidget):
         
         #bgi
         palette = QPalette()
-        palette.setBrush(self.backgroundRole(), QBrush(QPixmap(BACKGROUND_IMAGEPATHS.get('bg_start'))))
+        palette.setBrush(self.backgroundRole(), QBrush(QPixmap(BACKGROUND_IMAGEPATHS.get('start_bgi'))))
         self.setPalette(palette)
 
         #button

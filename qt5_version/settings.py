@@ -1,14 +1,14 @@
 import os
 
 TITLE = "Two Beats One"
-WIDTH = 750
-HEIGHT = 750
-MARGIN_LEFT = WIDTH / 10
-MARGIN_TOP = HEIGHT / 10
+WIDTH = 540
+HEIGHT = 540
 LINES = 4
-GRID_WIDTH = (WIDTH - 2 * MARGIN_LEFT) / (LINES - 1)
-GRID_HEIGHT = (HEIGHT - 2 * MARGIN_TOP) / (LINES - 1)
-PIECE_SIZE = int(GRID_WIDTH // 4)
+X0 = 50
+Y0 = 130
+GRID_WIDTH = WIDTH / (LINES - 1)
+GRID_HEIGHT = HEIGHT / (LINES - 1)
+PIECE_SIZE = 35
 
 SERVERNAME = '34.87.108.23'
 PORT = 6666
@@ -18,9 +18,17 @@ ICON_FILEPATH = os.path.join(os.getcwd(), 'img/icon/icon.ico')
 
 #bgi path
 BACKGROUND_IMAGEPATHS = {
-                            'bg_start': os.path.join(os.getcwd(), 'img/bg/bg_start.png'),
-                            'bg_game': os.path.join(os.getcwd(), 'img/bg/bg_game.png')
+                            'start_bgi': os.path.join(os.getcwd(), 'img/bg/start_bgi.png'),
+                            'game_bgi': os.path.join(os.getcwd(), 'img/bg/game_bgi.jpg'),
+                            'board_bgi': os.path.join(os.getcwd(), 'img/bg/board_bgi.png')
                         }
+#piece path
+PIECEPATH = {
+                'white': os.path.join(os.getcwd(), 'img/piece/white.png'),
+                'black': os.path.join(os.getcwd(), 'img/piece/black.png'),
+                'white1': os.path.join(os.getcwd(), 'img/piece/white1.png'),
+                'black1': os.path.join(os.getcwd(), 'img/piece/black1.png'),
+            }
 #button image path
 BUTTON_IMAGEPATHS = {
                         'online': [os.path.join(os.getcwd(), 'img/buttons/online_0.png'),

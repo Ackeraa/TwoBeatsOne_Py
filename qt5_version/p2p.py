@@ -5,8 +5,11 @@ import json
 import threading
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.Qt import *
 from PyQt5.QtWidgets import *
 from settings import *
+from board import *
+from tools import *
 
 class P2p(QWidget):
 
@@ -21,28 +24,21 @@ class P2p(QWidget):
         self.ownName = ownName
         self.oppName = None
         self.serverPort  = PORT
-        self.isRunning = False
-        
-        self.selected = [-1, -1] #piece that selected
-        self.moveTo = [-1, -1] #where to move 
-        self.board = [[-1 for _ in range(LINES)] for _ in range(LINES)]
-        for i in range(LINES):
-            self.board[i][LINES - 1] = own 
-            self.board[i][0] = opp 
+        self.board = Board()
 
         self.recvSignal.connect(self.transData)
 
         self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
        # self.tcpSocket.connect((SERVERNAME, PORT))
         data = {'type': 'ownName', 'data': self.ownName}
-       # self.tcpSocket.sendall(self.packSocket(data))
+       # self.tcpSocket.sendall(packSocket(data))
         
         #start a threading listening server
         threading.Thread(target = self.recvData).start()
 
 
         #set bgi
-        bgi = QPixmap('bg7.jpg')
+        bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
         bgi = bgi.scaled(900, 750)
         palette = QPalette()
         palette.setBrush(self.backgroundRole(), QBrush(bgi))
@@ -52,15 +48,38 @@ class P2p(QWidget):
         self.creatBoardWindow()
         self.creatChatWindow()
         layout = QHBoxLayout()
+        layout.setSpacing(20)
         layout.addLayout(self.boardWindow)
         layout.addLayout(self.chatWindow)
         self.setLayout(layout)
 
         self.resize(900, 750)
-        self.show()
+        self.center()
+
+        self.board.setPiece(self, 0)
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+
+            x = e.x()
+            y = e.y()
+            self.board.ownMove([x, y])
+
+            text = "x: {0}, y: {1}".format(x, y)
+            self.sendField.setText(text)
+
+
+    def center(self):
+
+        print("FUUUUUUUUUUUU")
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def creatBoardWindow(self):
         self.boardWindow = QVBoxLayout()
+        self.boardWindow.setSpacing(20)
         
         #creat button
         buttonLayout = QHBoxLayout()
@@ -77,10 +96,9 @@ class P2p(QWidget):
         buttonLayout.addWidget(self.exitBtn)
 
         #creat chess board
-
-        bgi = QPixmap('board1.png')
+        bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('board_bgi'))
         bgi = bgi.scaled(600, 600, Qt.KeepAspectRatio, Qt.FastTransformation)
-        board = QLabel()
+        board = QLabel(self)
         board.setPixmap(bgi)
 
         self.boardWindow.addLayout(buttonLayout)
@@ -109,21 +127,7 @@ class P2p(QWidget):
 
     def recvData(self):
         while True:
-            data = self.unPackSocket()
+            data = unPackSocket(self.tcpSocket)
             print(data)
             self.recvSignal.emit(data)
-
-    def packSocket(self, data):
-        return (json.dumps(data) + ' END').encode()
-
-    def unPackSocket(self):
-        data = ''
-        while True:
-            dataPart = self.tcpSocket.recv(1024).decode()
-            if 'END ' in dataPart:
-                data += dataPart[:dataPart.index('END')]
-                break
-            data += dataPart
-        return json.loads(data, encoding = 'utf-8')
-        
 
