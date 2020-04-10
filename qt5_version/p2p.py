@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import *
 from settings import *
 from board import *
 from tools import *
+from chat import *
 
 class P2p(QWidget):
 
@@ -28,14 +29,15 @@ class P2p(QWidget):
 
         self.recvSignal.connect(self.transData)
 
+
         self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-       # self.tcpSocket.connect((SERVERNAME, PORT))
+
+        self.tcpSocket.connect((SERVERNAME, PORT))
         data = {'type': 'ownName', 'data': self.ownName}
-       # self.tcpSocket.sendall(packSocket(data))
+        self.tcpSocket.sendall(packSocket(data))
         
         #start a threading listening server
         threading.Thread(target = self.recvData).start()
-
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -53,25 +55,27 @@ class P2p(QWidget):
         layout.addLayout(self.chatWindow)
         self.setLayout(layout)
 
-        self.resize(900, 750)
+        self.setFixedSize(900, 750)
         self.center()
 
-        self.board.setPiece(self, 0)
 
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
 
             x = e.x()
             y = e.y()
-            self.board.ownMove([x, y])
+            data = self.board.ownMove([x, y])
+            if data != -1:
+                if data['type'] == 'result' and data['data'] == 'win':
+                    pass
+                self.tcpSocket.sendall(packSocket(data))
 
             text = "x: {0}, y: {1}".format(x, y)
-            self.sendField.setText(text)
+           # self.sendField.setText(text)
+            self.sendField.clear()
 
 
     def center(self):
-
-        print("FUUUUUUUUUUUU")
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
@@ -109,21 +113,33 @@ class P2p(QWidget):
 
         nameLabel = QLabel("Chat Window")
         self.recvField = QTextEdit()
-        self.sendField = QTextEdit()
-        self.sendBtn = QPushButton('发送')
-
         self.recvField.setFocusPolicy(Qt.NoFocus) 
+        self.sendField = SendField(self)
 
         self.chatWindow.setSpacing(2)
         self.chatWindow.addWidget(nameLabel)
         self.chatWindow.addWidget(self.recvField)
         self.chatWindow.addWidget(self.sendField)
-        self.chatWindow.addWidget(self.sendBtn)
+
+    def sendMessage(self, message):
+        data = {'type': 'chat', 'data': message}
+        self.tcpSocket.sendall(packSocket(data)) 
 
     #to transcation data received
     def transData(self, data):
-        print("FUCK")
-        print(data)
+        print('transData:', data)
+        if data['type'] == 'move':
+            source = data['source']
+            dest = data['dest']
+            print(source, dest)
+            isLost = self.board.oppMove(source, dest)
+            if isLost:
+                pass
+        elif data['type'] == 'color':
+            self.board.setPiece(self, int(data['data']))
+        elif data['type'] == 'chat':
+            self.recvField.setPlainText(data['data'])
+
 
     def recvData(self):
         while True:

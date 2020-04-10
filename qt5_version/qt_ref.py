@@ -142,7 +142,7 @@ class TextField(QWidget):
 
         titleEdit = QLineEdit()
         authorEdit = QLineEdit()
-        reviewEdit = QTextEdit()
+        self.reviewEdit = QTextEdit()
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -154,12 +154,14 @@ class TextField(QWidget):
         grid.addWidget(authorEdit, 2, 1)
         
         grid.addWidget(review, 3, 0)
-        grid.addWidget(reviewEdit, 3, 1, 5, 1)
+        grid.addWidget(self.reviewEdit, 3, 1, 5, 1)
 
         self.setLayout(grid)
 
         self.setGeometry(300, 300, 350, 300)
         self.show()
+    def mousePressEvent(self, e):
+        self.reviewEdit.clear()
 
 class Signals(QWidget):
 
@@ -440,5 +442,5 @@ class chessBoard(QWidget):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = chessBoard()
+    ex = TextField()
     sys.exit(app.exec_())

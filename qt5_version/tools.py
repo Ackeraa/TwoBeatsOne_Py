@@ -1,4 +1,5 @@
 from settings import *
+import json
 
 def packSocket(data):
         return (json.dumps(data) + ' END').encode()
@@ -7,7 +8,7 @@ def unPackSocket(tcpSocket):
     data = ''
     while True:
         dataPart = tcpSocket.recv(1024).decode()
-        if 'END ' in dataPart:
+        if 'END' in dataPart:
             data += dataPart[:dataPart.index('END')]
             break
         data += dataPart
@@ -23,7 +24,8 @@ def p2i(pos):
 def validPos(pos):
     index = p2i(pos)
     pos_std = i2p(index)
-    if pos[0] >= X0 and pos[0] <= WIDTH + X0 and pos[1] >= Y0 and pos[1] <= Y0 + HEIGHT\
+    if pos[0] >= X0 - PIECE_SIZE and pos[0] <= WIDTH + X0 + PIECE_SIZE and\
+            pos[1] >= Y0 + PIECE_SIZE and pos[1] <= Y0 + HEIGHT + PIECE_SIZE\
             and abs(pos[0] - pos_std[0]) <= PIECE_SIZE and abs(pos[1] - pos_std[1]) <= PIECE_SIZE:
         return index
     else:
