@@ -22,8 +22,8 @@ class P2p(QWidget):
     def __init__(self, own, opp, ownName, serverName):
         super().__init__()
 
-        self.ownName = ownName
-        self.oppName = None
+        self.ownName = 'own'
+        self.oppName = 'opp'
         self.serverPort  = PORT
         self.board = Board()
 
@@ -61,7 +61,6 @@ class P2p(QWidget):
 
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
-
             x = e.x()
             y = e.y()
             data = self.board.ownMove([x, y])
@@ -112,8 +111,7 @@ class P2p(QWidget):
         self.chatWindow = QVBoxLayout()
 
         nameLabel = QLabel("Chat Window")
-        self.recvField = QTextEdit()
-        self.recvField.setFocusPolicy(Qt.NoFocus) 
+        self.recvField = ReceiveField()
         self.sendField = SendField(self)
 
         self.chatWindow.setSpacing(2)
@@ -123,6 +121,9 @@ class P2p(QWidget):
 
     def sendMessage(self, message):
         data = {'type': 'chat', 'data': message}
+        #show in own screen
+        self.recvField.showMessage(self.ownName, 'own', data['data'])
+        #send
         self.tcpSocket.sendall(packSocket(data)) 
 
     #to transcation data received
@@ -138,7 +139,7 @@ class P2p(QWidget):
         elif data['type'] == 'color':
             self.board.setPiece(self, int(data['data']))
         elif data['type'] == 'chat':
-            self.recvField.setPlainText(data['data'])
+            self.recvField.showMessage(self.oppName, 'opp', data['data'])
 
 
     def recvData(self):

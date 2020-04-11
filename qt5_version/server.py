@@ -1,5 +1,6 @@
 from socket import *
 import json
+import threading
 
 PORT = 6666
 
@@ -12,29 +13,32 @@ class Server:
         print('Ready to connect...')
 
         self.player1, self.addr1 = self.serverSocket.accept()
-        data1 = {'type': 'color', 'data': 1}
         print('Player1 connected')
 
         self.player2, self.addr2 = self.serverSocket.accept()
-        data2 = {'type': 'color', 'data': 0}
         print('Player2 connected')
 
+        data1 = {'type': 'color', 'data': 1}
         self.player1.sendall(self.packSocket(data1))
         print("Send to player1", data1)
-        self.player2.sendall(self.packSocket(data1))
+
+        data2 = {'type': 'color', 'data': 0}
+        self.player2.sendall(self.packSocket(data2))
         print("Send to player2", data2)
 
-        print('Read to receive...')
+        print('Start to create threading...')
+        threading.Thread(target=self.run, args=(self.player1, self.player2,)).start() #first player
+        threading.Thread(target=self.run, args=(self.player2, self.player1,)).start() #second player
+        print('Threading created, start to communicate')
 
 
-    def run(self):
-        sentence = self.player1.recv(1024).decode()
-        if sentence == '':
-            self.close()
-        print('received from ', self.addr1, ': ', sentence)
-        self.player2.send(sentence.encode())
-        self.player1, self.player2 = self.player2, self.player1
-        self.addr1, self.addr2 = self.addr2, self.addr1
+    def run(self, own, opp):
+        while True:
+            sentence = own.recv(1024).decode()
+            if sentence == '':
+                self.close()
+            print('received: ', sentence)
+            opp.send(sentence.encode())
 
     def close(self):
         self.player1.close()
@@ -42,11 +46,9 @@ class Server:
 
     def packSocket(self, data):
         return (json.dumps(data) + ' END').encode()
-        
+
 
 if __name__ == '__main__':
     server = Server()
-    while True:
-        server.run()
 
 

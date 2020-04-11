@@ -143,6 +143,9 @@ class TextField(QWidget):
         titleEdit = QLineEdit()
         authorEdit = QLineEdit()
         self.reviewEdit = QTextEdit()
+        self.reviewEdit.setFontFamily('consolas')
+        self.reviewEdit.setTextColor (Qt.red)
+        self.reviewEdit.setFontPointSize(20)
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -161,7 +164,8 @@ class TextField(QWidget):
         self.setGeometry(300, 300, 350, 300)
         self.show()
     def mousePressEvent(self, e):
-        self.reviewEdit.clear()
+        self.reviewEdit.setFontWeight(100)
+        self.reviewEdit.append("fucj")
 
 class Signals(QWidget):
 
