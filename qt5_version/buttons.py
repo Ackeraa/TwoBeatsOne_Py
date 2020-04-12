@@ -32,3 +32,23 @@ class PushButton(QLabel):
             self.need_emit = False
             self.setPixmap(self.image_1)
             self.click_signal.emit()
+
+class Button(QLabel):
+    click_signal = pyqtSignal()
+    need_emit = False
+
+    def __init__(self, name, parent = None):
+        super(Button, self).__init__(parent)
+
+        self.setFixedSize(100, 40);
+        self.setText("     " + name)
+        self.setStyleSheet("background-image:url(button.png);font-size: 20px; color:#28085D;font-family:STKaiti")
+
+    def mousePressEvent(self, e):
+        if e.buttons() == QtCore.Qt.LeftButton:
+            self.need_emit = True
+
+    def mouseReleaseEvent(self, e):
+        if self.need_emit:
+            self.need_emit = False
+            self.click_signal.emit()

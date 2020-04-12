@@ -11,6 +11,7 @@ from settings import *
 from board import *
 from tools import *
 from chat import *
+from buttons import *
 
 class P2p(QWidget):
 
@@ -30,14 +31,14 @@ class P2p(QWidget):
         self.recvSignal.connect(self.transData)
 
 
-        self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.tcpSocket.connect((SERVERNAME, PORT))
+        #self.tcpSocket.connect((SERVERNAME, PORT))
         data = {'type': 'ownName', 'data': self.ownName}
-        self.tcpSocket.sendall(packSocket(data))
+        #self.tcpSocket.sendall(packSocket(data))
         
         #start a threading listening server
-        threading.Thread(target = self.recvData).start()
+        #threading.Thread(target = self.recvData).start()
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -82,15 +83,15 @@ class P2p(QWidget):
 
     def creatBoardWindow(self):
         self.boardWindow = QVBoxLayout()
-        self.boardWindow.setSpacing(20)
+        self.boardWindow.setSpacing(2)
         
         #creat button
         buttonLayout = QHBoxLayout()
         
-        self.startBtn = QPushButton('开始', self)
-        self.backBtn = QPushButton('悔棋', self)
-        self.giveUpBtn = QPushButton('认输', self)
-        self.exitBtn = QPushButton('退出', self)
+        self.startBtn = Button('开始', self)
+        self.backBtn = Button('悔棋', self)
+        self.giveUpBtn = Button('认输', self)
+        self.exitBtn = Button('退出', self)
 
         buttonLayout.setSpacing(10) 
         buttonLayout.addWidget(self.startBtn)
@@ -110,11 +111,11 @@ class P2p(QWidget):
     def creatChatWindow(self):
         self.chatWindow = QVBoxLayout()
 
-        nameLabel = QLabel("Chat Window")
+        nameLabel = TitleField()
         self.recvField = ReceiveField()
         self.sendField = SendField(self)
 
-        self.chatWindow.setSpacing(2)
+        self.chatWindow.setSpacing(0)
         self.chatWindow.addWidget(nameLabel)
         self.chatWindow.addWidget(self.recvField)
         self.chatWindow.addWidget(self.sendField)
