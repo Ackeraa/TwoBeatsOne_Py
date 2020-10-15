@@ -31,14 +31,14 @@ class P2p(QWidget):
         self.recvSignal.connect(self.transData)
 
 
-        #self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        #self.tcpSocket.connect((SERVERNAME, PORT))
+        self.tcpSocket.connect((SERVERNAME, PORT))
         data = {'type': 'ownName', 'data': self.ownName}
-        #self.tcpSocket.sendall(packSocket(data))
+        self.tcpSocket.sendall(packSocket(data))
         
         #start a threading listening server
-        #threading.Thread(target = self.recvData).start()
+        threading.Thread(target = self.recvData).start()
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -120,6 +120,9 @@ class P2p(QWidget):
         self.chatWindow.addWidget(self.recvField)
         self.chatWindow.addWidget(self.sendField)
 
+    #Be ready
+
+    #chat
     def sendMessage(self, message):
         data = {'type': 'chat', 'data': message}
         #show in own screen
