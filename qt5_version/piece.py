@@ -6,7 +6,7 @@ from settings import *
 from tools import *
 
 class Piece(QLabel):
-    def __init__(self, grandParent, parent, color, pos):
+    def __init__(self, grandParent, parent, color, pos, X0, Y0):
         super(Piece, self).__init__(grandParent)
 
         self.color = color 
@@ -18,12 +18,12 @@ class Piece(QLabel):
             image = QPixmap(PIECEPATH.get('black'))
         self.setFixedSize(image.size())
         self.setPixmap(image)
-        self.move(pos)
+        self.move(pos, X0, Y0)
         self.show()
     
-    def move(self, pos):
+    def move(self, pos, X0, Y0):
         self.pos = pos
-        pos = i2p(pos) 
+        pos = i2p(pos, X0, Y0) 
         super().move(pos[0] - PIECE_SIZE, pos[1] - PIECE_SIZE)
 
     def mousePressEvent(self, e):

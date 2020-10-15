@@ -5,10 +5,13 @@ from PyQt5.QtWidgets import *
 from settings import *
 from buttons import *
 from p2p import *
+from p2c import *
 
 class gameStartUI(QWidget):
     def __init__(self, parent = None, **kwargs):
         super(gameStartUI, self).__init__(parent)
+
+        self.playWithAI()
         self.setFixedSize(760, 650)
         self.setWindowTitle('Two Beats One')
         #self.setWindowIcon(QIcon(cfg.ICON_FILEPATH))
@@ -36,7 +39,9 @@ class gameStartUI(QWidget):
         self.game_type.show()
 
     def playWithAI(self):
-        pass
+        self.close()
+        self.game_type = P2c(1, 0)
+        self.game_type.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -44,6 +49,6 @@ if __name__ == '__main__':
     font = QFont()
     font.setPointSize(12)
     handle.setFont(font)
-    handle.show()
+   # handle.show()
     sys.exit(app.exec_())
 

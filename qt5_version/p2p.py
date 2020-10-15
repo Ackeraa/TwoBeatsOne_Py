@@ -26,7 +26,7 @@ class P2p(QWidget):
         self.ownName = 'own'
         self.oppName = 'opp'
         self.serverPort  = PORT
-        self.board = Board()
+        self.board = Board(50, 130)
 
         self.recvSignal.connect(self.transData)
 

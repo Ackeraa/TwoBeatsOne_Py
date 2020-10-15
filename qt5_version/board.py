@@ -2,11 +2,13 @@ from settings import *
 from piece import *
 
 class Board:
-    def __init__(self):
+    def __init__(self, X0, Y0):
         self.ownPieces = [-1 for _ in range(LINES)]
         self.oppPieces = [-1 for _ in range(LINES)]
         self.selected = -1
         self.moved = -1
+        self.X0 = X0
+        self.Y0 = Y0
 
     def setPiece(self, parent, color):
         #0: white; 1: black
@@ -16,12 +18,13 @@ class Board:
         self.moved = color ^ 1 
         self.board = [[-1 for _ in range(LINES)] for _ in range(LINES)]
         for i in range(LINES):
-            self.ownPieces[i] = Piece(parent, self, self.own, [i, LINES - 1])
-            self.oppPieces[i] = Piece(parent, self, self.opp, [i, 0])
+            self.ownPieces[i] = Piece(parent, self, self.own, [i, LINES - 1], self.X0, self.Y0)
+            self.oppPieces[i] = Piece(parent, self, self.opp, [i, 0], self.X0, self.Y0)
             self.board[i][LINES - 1] = self.own
             self.board[i][0] = self.opp
 
     def ownMove(self, pos):
+        print("FUCK ", self.moved)
         #is own round
         if self.moved == 1:
             return -1
@@ -29,7 +32,7 @@ class Board:
         if self.selected == -1:
             return -1
 
-        pos = validPos(pos) 
+        pos = validPos(pos, self.X0, self.Y0) 
         print("Try to MOVE: ", pos)
 
         #is valid move
@@ -39,7 +42,7 @@ class Board:
         source = self.selected.pos
         dest = pos
 
-        self.selected.move(dest)
+        self.selected.move(dest, self.X0, self.Y0)
         self.board[source[0]][source[1]] = -1
         self.board[dest[0]][dest[1]] = self.own 
         self.moved = 1
