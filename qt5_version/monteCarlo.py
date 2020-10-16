@@ -1,6 +1,6 @@
 import numpy as np
 from collections import defaultdict
-from game_state import *
+from gameState import *
 
 class MonteCarloNode():
     def __init__(self, state, parent = None):
@@ -20,7 +20,7 @@ class MonteCarloNode():
     @property
     def q(self):
         wins = self._results[self.parent.state.next_to_move]
-        loses = self._results[-1 * self.parent.state.next_to_move]
+        loses = self._results[1 - self.parent.state.next_to_move]
         return wins - loses
 
     @property
@@ -39,8 +39,15 @@ class MonteCarloNode():
 
     def rollout(self):
         current_rollout_state = self.state
+        dep = 0
         while not current_rollout_state.is_game_over():
+            dep += 1 
+            if dep > DEPTH:
+                return -1
             possible_moves = current_rollout_state.get_legal_actions()
+            #if one can not move, then the other wins
+            if len(possible_moves) == 0:
+                return 1 - self.state.next_to_move
             action = self.rollout_policy(possible_moves)
             current_rollout_state = current_rollout_state.move(action)
         return current_rollout_state.game_result
@@ -54,7 +61,7 @@ class MonteCarloNode():
     def is_fully_expanded(self):
         return len(self.untried_actions) == 0
 
-    def best_child(self, c_param = 1.4):
+    def best_child(self, c_param = CPRAMS):
         choice_weight = [
                 (c.q / c.n) + c_param * np.sqrt((2 * np.log(self.n) / c.n))
                 for c in self.children
@@ -69,7 +76,6 @@ class MonteCarloTreeSearch(object):
         self.root = node
 
     def best_action(self, simulations_number):
-
         for _ in range(0, simulations_number):
             v = self._tree_policy()
             reward = v.rollout()

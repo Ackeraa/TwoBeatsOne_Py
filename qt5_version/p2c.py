@@ -3,6 +3,7 @@ import pygame
 import random
 import json
 import threading
+import multiprocessing
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.Qt import *
@@ -13,12 +14,17 @@ from tools import *
 from chat import *
 from buttons import *
 from aiSearch import *
-from gameState import *
 
 class P2c(QWidget):
 
     def __init__(self, own, opp):
         super().__init__()
+
+        self.own = own
+        self.moved = 0
+        self.lose = 0
+        #listen if moved
+        threading.Thread(target = self.ai_move).start()
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -40,16 +46,55 @@ class P2c(QWidget):
         self.setFixedSize(650, 700)
         self.center()
 
+    def new(self):
+
+        for i in range(len(self.board.ownPieces)):
+            piece = self.board.ownPieces[i]
+            if piece != None:
+                piece.deleteLater()
+                self.board.ownPieces[i] = None
+
+        for i in range(len(self.board.oppPieces)):
+            piece = self.board.oppPieces[i]
+            if piece != None:
+                piece.deleteLater()
+                self.board.oppPieces[i] = None
+
+        self.moved = 0
+        self.board = Board(48, 100)
+        self.board.setPiece(self, self.own)
+
+        self.setFixedSize(650, 700)
+        self.center()
+
+    def ai_move(self):
+        while True:
+            if self.moved == 1:
+                self.moved = 0
+                aiSearch = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH)
+                result = aiSearch.search()
+                print("FUUUULK", result)
+                is_lose = self.board.oppMove(result[0], result[1])
+                if is_lose:
+                    print("LOSE")
+                    self.lose = 1
+
     def mousePressEvent(self, e):
+        if self.lose:
+            self.lose = 0
+            self.new()
+
         if e.button() == Qt.LeftButton:
             x = e.x()
             y = e.y()
             print(x, y)
-            self.board.ownMove([x, y])
-            state = gameState(self.board.own_pieces, self.board.opp_pieces)
-            aiSearch = AISearch(state)
-            result = aiSearch.search()
-            self.board.oppMove(result[0], result[1])
+            result = self.board.ownMove([x, y])
+            if result["type"] == "result" and  result["data"] == "win":
+                print("WIN")
+                self.new() 
+            if result["type"] == "move":
+                self.moved = 1
+                print("TESZT ", self.moved)
 
     def center(self):
         qr = self.frameGeometry()
@@ -60,10 +105,10 @@ class P2c(QWidget):
     def creatBoardWindow(self):
         self.boardWindow = QVBoxLayout()
         self.boardWindow.setSpacing(2)
-        
+
         #creat button
         buttonLayout = QHBoxLayout()
-        
+
         self.startBtn = Button('开始', self)
         self.backBtn = Button('悔棋', self)
         self.giveUpBtn = Button('认输', self)

@@ -30,7 +30,6 @@ class P2p(QWidget):
 
         self.recvSignal.connect(self.transData)
 
-
         self.tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.tcpSocket.connect((SERVERNAME, PORT))
@@ -144,7 +143,6 @@ class P2p(QWidget):
             self.board.setPiece(self, int(data['data']))
         elif data['type'] == 'chat':
             self.recvField.showMessage(self.oppName, 'opp', data['data'])
-
 
     def recvData(self):
         while True:

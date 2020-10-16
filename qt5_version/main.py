@@ -5,13 +5,14 @@ from PyQt5.QtWidgets import *
 from settings import *
 from buttons import *
 from p2p import *
-from p2c import *
+from p2c import P2c
 
 class gameStartUI(QWidget):
     def __init__(self, parent = None, **kwargs):
         super(gameStartUI, self).__init__(parent)
 
         self.playWithAI()
+        '''
         self.setFixedSize(760, 650)
         self.setWindowTitle('Two Beats One')
         #self.setWindowIcon(QIcon(cfg.ICON_FILEPATH))
@@ -32,6 +33,7 @@ class gameStartUI(QWidget):
         self.online_button.move(250, 350)
         self.online_button.show()
         self.online_button.click_signal.connect(self.playOnline)
+        '''
 
     def playOnline(self):
         self.close()

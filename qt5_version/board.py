@@ -27,17 +27,17 @@ class Board:
         print("FUCK ", self.moved)
         #is own round
         if self.moved == 1:
-            return -1
+            return {'type': 'false', 'data' : 'not your round'}
         #is selected a piece
         if self.selected == -1:
-            return -1
+            return {'type': 'false', 'data': 'not selected'}
 
         pos = validPos(pos, self.X0, self.Y0) 
         print("Try to MOVE: ", pos)
 
         #is valid move
         if pos[0] == -1 or abs(pos[0] - self.selected.pos[0]) + abs(pos[1] - self.selected.pos[1]) > 1:
-            return -1
+            return {'type': 'false', 'data': 'not valid'}
         #prereserve source and destination
         source = self.selected.pos
         dest = pos
@@ -62,7 +62,7 @@ class Board:
         isWin = -1
         for piece in self.oppPieces:
             if piece != None and piece.pos == source:
-                piece.move(dest)
+                piece.move(dest, self.X0, self.Y0)
                 break
 
         print('check', source)
