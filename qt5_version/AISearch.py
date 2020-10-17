@@ -10,7 +10,8 @@ class AISearch():
         self.simulations_number = simulations_number
         self.search_depth = search_depth
         self.board = [[-1 for _ in range(LINES)] for _ in range(LINES)]
-        self.best
+        self.best = None
+        self.fuck = 0
 
         self.pieces = [[], []]
         for piece in own_pieces:
@@ -27,11 +28,13 @@ class AISearch():
                 self.board[pos[0]][pos[1]] = piece.color
 
     def search(self):
-
-        self.alphaBeta(self.own, self.search_depth, -INF, INF)
-        source = self.pieces[self.best[0]]
+        self.fuck = 0
+        self.alphaBeta(self.own, self.search_depth, -INF, INF, None, None)
+        print("----------------", self.fuck)
+        source = self.pieces[self.own][self.best[0]]
         dirs = self.best[1]
         dest = [source[0] + dirs[0], source[1] + dirs[1]] 
+        print(f"AI Move from {source} to {dest}")
         return [source, dest]
         
     def is_legal(self, x, y):
@@ -41,55 +44,74 @@ class AISearch():
             return False
         return True
 
-    def eat(self, opp, board, pos):
-        board[pos[0]][pos[1]] = -1
-        for piece in pieces[opp]:
+    def eat(self, opp, pos):
+        self.board[pos[0]][pos[1]] = -1
+        for piece in self.pieces[opp]:
             if piece == pos:
-                pieces[opp].remove(piece)
+                self.pieces[opp].remove(piece)
                 break
     
-    def check_eat(self, own, board, pos):
+    def check_eat(self, own, pos):
         #own: current player
         #opp: opposite player
         opp = 1 - own
         x = pos[0]
         y = pos[1]
+        board = self.board
 
         if board[x][0] == opp and board[x][1] == own and board[x][2] == own and board[x][3] == -1:
-            self.eat(opp, board, [x, 0])
+            self.eat(opp, [x, 0])
         if board[x][1] == opp and board[x][0] == -1 and board[x][2] == own and board[x][3] == own:
-            self.eat(opp, board, [x, 1])
+            self.eat(opp, [x, 1])
         if board[x][2] == opp and board[x][3] == -1 and board[x][0] == own and board[x][1] == own:
-            self.eat(opp, board, [x, 2])
+            self.eat(opp, [x, 2])
         if board[x][3] == opp and board[x][1] == own and board[x][2] == own and board[x][0] == -1:
-            self.eat(opp, board, [x, 3])
+            self.eat(opp, [x, 3])
 
         if board[0][y] == opp and self.board[1][y] == own and board[2][y] == own and board[3][y] == -1:
-            self.eat(opp, board, [0, y])
+            self.eat(opp, [0, y])
         if board[1][y] == opp and board[0][y] == -1 and board[2][y] == own and board[3][y] == own:
-            self.eat(opp, board, [1, y])
+            self.eat(opp, [1, y])
         if board[2][y] == opp and board[3][y] == -1 and board[0][y] == own and board[1][y] == own:
-            self.eat(opp, board, [2, y])
+            self.eat(opp, [2, y])
         if board[3][y] == opp and board[1][y] == own and board[2][y] == own and board[0][y] == -1:
-            self.eat(opp, board, [3, y])
+            self.eat(opp, [3, y])
 
-    def alphaBeta(self, player, depth, alpha, beta):
+    def alphaBeta(self, player, depth, alpha, beta, source, dest):
         
         last_pieces = copy.deepcopy(self.pieces)
         last_board = copy.deepcopy(self.board)
 
+        if len(self.pieces[1 - self.own]) <= 1:
+            return 1000 * depth
+        if len(self.pieces[self.own]) <= 1:
+            return -1000 * depth
+
         if depth == 0:
+            '''
+            print("####", len(self.pieces[self.own]), len(self.pieces[1 - self.own]))
+            print(f"from {source}, to {dest}")
+            for i in range(LINES):
+                for j in range(LINES):
+                    print("%3d" % self.board[j][i], end = "")
+                print("")
+            '''
+            self.fuck += 1
+            return len(self.pieces[self.own]) - 2 * len(self.pieces[1 - self.own])
+            '''
             state = GameState(player, self.pieces, self.board)
             node = MonteCarloNode(state)
             monteCarlo = MonteCarloTreeSearch(node)
-            best = self.monteCarlo.best_action(self.simulations_number)
+            best = monteCarlo.best_action(self.simulations_number)
             if best.parent.state.next_to_move == self.own:
+                #print("FUCLLL ", best.q / best.n)
                 return best.q / best.n
             else:
                 return -best.q / best.n
+            '''
 
         if player == self.own:
-            for i in range(len(last_pieces)):
+            for i in range(len(self.pieces[player])):
                 piece = self.pieces[player][i]
                 for dirs in DIR:
                     x = piece[0] + dirs[0] 
@@ -98,25 +120,23 @@ class AISearch():
                         self.pieces[player][i] = [x, y]
                         self.board[piece[0]][piece[1]] = -1
                         self.board[x][y] = player
+                        self.check_eat(player, [x, y])
+                        
+                        val = self.alphaBeta(1 - player, depth - 1, alpha, beta, piece, [x, y])
 
-                        self.check_eat(player, self.board, [x, y])
-                    
-                    val = alphaBeta(1 - player, depth - 1, aplha, beta)
+                        #undo
+                        self.pieces = copy.deepcopy(last_pieces)
+                        self.board = copy.deepcopy(last_board)
 
-                    #undo
-                    self.pieces = copy.deepcopy(last_pieces)
-                    self.board = copy.deepcopy(last_board)
-
-                    if val > alpha:
-                        if depth == SEARCH_DEPTH:
-                            self.best = [i, idrs]
-                        alpha = val
-                    if alpha >= beta:
-                        return alpha
+                        if val > alpha:
+                            if depth == SEARCH_DEPTH:
+                                self.best = [i, dirs]
+                            alpha = val
+                        if alpha >= beta:
+                            return alpha
             return alpha
-
         else:
-            for i in range(len(last_pieces)):
+            for i in range(len(self.pieces[player])):
                 piece = self.pieces[player][i]
                 for dirs in DIR:
                     x = piece[0] + dirs[0] 
@@ -125,19 +145,18 @@ class AISearch():
                         self.pieces[player][i] = [x, y]
                         self.board[piece[0]][piece[1]] = -1
                         self.board[x][y] = player
-
-                        self.check_eat(player, self.board, [x, y])
+                        self.check_eat(player, [x, y])
                     
-                    val = alphaBeta(1 - player, depth - 1, aplha, beta)
+                        val = self.alphaBeta(1 - player, depth - 1, alpha, beta, piece, [x, y])
 
-                    #undo
-                    self.pieces = copy.deepcopy(last_pieces)
-                    self.board = copy.deepcopy(last_board)
+                        #undo
+                        self.pieces = copy.deepcopy(last_pieces)
+                        self.board = copy.deepcopy(last_board)
 
-                    if val < beta:
-                        beta = val
-                    if alpha >= beta:
-                        return beta
+                        if val < beta:
+                            beta = val
+                        if alpha >= beta:
+                            return beta
             return beta
 
 

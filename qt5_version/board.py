@@ -1,5 +1,9 @@
 from settings import *
 from piece import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.Qt import *
+from PyQt5.QtWidgets import *
 
 class Board:
     def __init__(self, X0, Y0):

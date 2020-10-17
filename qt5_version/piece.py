@@ -25,6 +25,7 @@ class Piece(QLabel):
         self.pos = pos
         pos = i2p(pos, X0, Y0) 
         super().move(pos[0] - PIECE_SIZE, pos[1] - PIECE_SIZE)
+        QApplication.processEvents()
 
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:

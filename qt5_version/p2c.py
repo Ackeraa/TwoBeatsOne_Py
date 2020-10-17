@@ -2,8 +2,7 @@ import socket
 import pygame
 import random
 import json
-import threading
-import multiprocessing
+import time
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.Qt import *
@@ -21,10 +20,7 @@ class P2c(QWidget):
         super().__init__()
 
         self.own = own
-        self.moved = 0
-        self.lose = 0
         #listen if moved
-        threading.Thread(target = self.ai_move).start()
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -60,29 +56,13 @@ class P2c(QWidget):
                 piece.deleteLater()
                 self.board.oppPieces[i] = None
 
-        self.moved = 0
         self.board = Board(48, 100)
         self.board.setPiece(self, self.own)
 
         self.setFixedSize(650, 700)
         self.center()
 
-    def ai_move(self):
-        while True:
-            if self.moved == 1:
-                self.moved = 0
-                aiSearch = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH)
-                result = aiSearch.search()
-                print("FUUUULK", result)
-                is_lose = self.board.oppMove(result[0], result[1])
-                if is_lose:
-                    print("LOSE")
-                    self.lose = 1
-
     def mousePressEvent(self, e):
-        if self.lose:
-            self.lose = 0
-            self.new()
 
         if e.button() == Qt.LeftButton:
             x = e.x()
@@ -93,8 +73,14 @@ class P2c(QWidget):
                 print("WIN")
                 self.new() 
             if result["type"] == "move":
-                self.moved = 1
-                print("TESZT ", self.moved)
+                QApplication.processEvents()
+                aiSearch = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH)
+                result = aiSearch.search()
+                print("FUUUULK", result)
+                is_lose = self.board.oppMove(result[0], result[1])
+                if is_lose:
+                    print("LOSE")
+                    self.new()
 
     def center(self):
         qr = self.frameGeometry()
@@ -129,3 +115,8 @@ class P2c(QWidget):
         self.boardWindow.addLayout(buttonLayout)
         self.boardWindow.addWidget(board)
 
+if __name__ == '__main__':
+    app=QApplication(sys.argv)
+    win=P2c(1, 0)
+    win.show()
+    sys.exit(app.exec_())
