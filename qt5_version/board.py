@@ -60,6 +60,26 @@ class Board:
         self.selected = -1
         return data
 
+
+    def ownMove1(self, source, dest):
+        
+        print('own moved: ', source, '->', dest)
+        isWin = -1
+        for piece in self.ownPieces:
+            if piece != None and piece.pos == source:
+                piece.move(dest, self.X0, self.Y0)
+                break
+
+        print('check', source)
+        self.printBoard('Before own move')
+        self.board[source[0]][source[1]] = -1
+        self.board[dest[0]][dest[1]] = self.own
+        self.moved = 0
+        isWin = self.isWin(self.own, dest)
+        self.printBoard('after own move')
+
+        return isWin
+
     def oppMove(self, source, dest):
         
         print('opp moved: ', source, '->', dest)

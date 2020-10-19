@@ -4,7 +4,7 @@ from settings import *
 from alphaBeta import *
 
 class AISearch():
-    def __init__(self, own, own_pieces, opp_pieces, simulations_number, search_depth):
+    def __init__(self, own, own_pieces, opp_pieces, simulations_number, search_depth, choice):
 
         self.own = own
         self.simulations_number = simulations_number
@@ -12,6 +12,7 @@ class AISearch():
         self.board = [[-1 for _ in range(LINES)] for _ in range(LINES)]
         self.best = None
         self.fuck = 0
+        self.choice = choice
 
         self.pieces = [[], []]
         for piece in own_pieces:
@@ -28,15 +29,27 @@ class AISearch():
                 self.board[pos[0]][pos[1]] = piece.color
 
     def search(self):
-        self.fuck = 0
-        self.alphaBeta(self.own, self.search_depth, -INF, INF, None, None)
-        print("----------------", self.fuck)
-        source = self.pieces[self.own][self.best[0]]
-        dirs = self.best[1]
-        dest = [source[0] + dirs[0], source[1] + dirs[1]] 
-        print(f"AI Move from {source} to {dest}")
-        return [source, dest]
-        
+        if self.choice == 1:
+            self.fuck = 0
+            self.alphaBeta(self.own, self.search_depth, -INF, INF, None, None)
+            print("----------------", self.fuck)
+            source = self.pieces[self.own][self.best[0]]
+            dirs = self.best[1]
+            dest = [source[0] + dirs[0], source[1] + dirs[1]] 
+            print(f"AI Move from {source} to {dest}")
+            return [source, dest]
+        else:
+            state = GameState(self.own, self.pieces, self.board)
+            node = MonteCarloNode(state)
+            monteCarlo = MonteCarloTreeSearch(node)
+            best = monteCarlo.best_action(self.simulations_number)
+            
+            parent = node.state.pieces[self.own]
+            child = best.state.pieces[self.own]
+            for i in range(len(parent)):
+                if parent[i] != child[i]:
+                    return [parent[i], child[i]]
+
     def is_legal(self, x, y):
         if x < 0 or x >= LINES or y < 0 or y >= LINES:
             return False

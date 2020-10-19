@@ -7,6 +7,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.Qt import *
 from PyQt5.QtWidgets import *
+import threading
 from settings import *
 from board import *
 from tools import *
@@ -20,7 +21,6 @@ class P2c(QWidget):
         super().__init__()
 
         self.own = own
-        #listen if moved
 
         #set bgi
         bgi = QPixmap(BACKGROUND_IMAGEPATHS.get('game_bgi'))
@@ -39,11 +39,19 @@ class P2c(QWidget):
         self.board = Board(48, 100)
         self.board.setPiece(self, own)
 
+        #listen if moved
+        self.own_moved = 0
+        self.opp_moved = 1
+        threading.Thread(target = self.move_own).start()
+        threading.Thread(target = self.move_opp).start()
+
         self.setFixedSize(650, 700)
         self.center()
 
     def new(self):
 
+        self.own_moved = 0
+        self.opp_moved = 1
         for i in range(len(self.board.ownPieces)):
             piece = self.board.ownPieces[i]
             if piece != None:
@@ -63,6 +71,53 @@ class P2c(QWidget):
         self.center()
 
     def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            p1 = AISearch(self.own, self.board.ownPieces, self.board.oppPieces, SIMULATIONS, SEARCH_DEPTH, 0)
+            result = p1.search()
+            print("-----OWN-----", result)
+            is_lose = self.board.ownMove1(result[0], result[1])
+            QApplication.processEvents()
+            time.sleep(1)
+            if is_lose:
+                print("lose")
+                self.new()
+            p2 = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH, 1)
+            result = p2.search()
+            print("-----OPP-----", result)
+            is_lose = self.board.oppMove(result[0], result[1])
+            QApplication.processEvents()
+            if is_lose:
+                print("lose")
+                self.new()
+
+    def move_own(self):
+        while True:
+            if self.opp_moved:
+                p1 = AISearch(self.own, self.board.ownPieces, self.board.oppPieces, SIMULATIONS, SEARCH_DEPTH, 0)
+                result = p1.search()
+                print("-----OWN-----", result)
+                is_lose = self.board.ownMove1(result[0], result[1])
+                if is_lose:
+                    print("lose")
+                    self.new()
+                self.opp_moved = 0
+                self.own_moved = 1
+
+    def move_opp(self):
+        while True:
+            if self.own_moved:
+                p2 = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH, 1)
+                result = p2.search()
+                print("-----OPP-----", result)
+                is_lose = self.board.oppMove(result[0], result[1])
+                QApplication.processEvents()
+                if is_lose:
+                    print("lose")
+                self.own_moved = 0
+                self.opp_moved = 1
+
+    '''
+    def mousePressEvent(self, e):
 
         if e.button() == Qt.LeftButton:
             x = e.x()
@@ -74,13 +129,14 @@ class P2c(QWidget):
                 self.new() 
             if result["type"] == "move":
                 QApplication.processEvents()
-                aiSearch = AISearch(1 - self.own, self.board.oppPieces, self.board.ownPieces, SIMULATIONS, SEARCH_DEPTH)
-                result = aiSearch.search()
-                print("FUUUULK", result)
-                is_lose = self.board.oppMove(result[0], result[1])
+                aisearch = aisearch(1 - self.own, self.board.opppieces, self.board.ownpieces, simulations, search_depth)
+                result = aisearch.search()
+                print("fuuuulk", result)
+                is_lose = self.board.oppmove(result[0], result[1])
                 if is_lose:
-                    print("LOSE")
+                    print("lose")
                     self.new()
+    '''
 
     def center(self):
         qr = self.frameGeometry()

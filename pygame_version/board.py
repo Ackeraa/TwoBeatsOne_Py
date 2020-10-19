@@ -108,13 +108,13 @@ class Board:
             self.eat(x, 3)
 
         if self.board[0][y] == opp and self.board[1][y] == own and self.board[2][y] == own and self.board[3][y] == -1:
-            self.eat(x, y)
+            self.eat(0, y)
         if self.board[1][y] == opp and self.board[0][y] == -1 and self.board[2][y] == own and self.board[3][y] == own:
-            self.eat(x, 1)
+            self.eat(1, y)
         if self.board[2][y] == opp and self.board[3][y] == -1 and self.board[0][y] == own and self.board[1][y] == own:
-            self.eat(x, 2)
+            self.eat(2, y)
         if self.board[3][y] == opp and self.board[1][y] == own and self.board[2][y] == own and self.board[0][y] == -1:
-            self.eat(x, 3)
+            self.eat(3, y)
 
         piece_cnt = 0
         for i in range(LINES):
